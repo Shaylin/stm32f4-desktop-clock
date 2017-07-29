@@ -12,7 +12,12 @@ Oled::Oled()
 
 	screenWidth = 128;
 	screenHeight = 64;
-	screenBuffer = uint8_t[screenWidth * screenHeight];
+	screenBuffer = new uint8_t[screenWidth * screenHeight];
+}
+
+Oled::~Oled()
+{
+	delete[] screenBuffer;
 }
 
 void Oled::init()
@@ -25,4 +30,9 @@ void Oled::initRCC()
 {
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2ENR_SPI1EN, ENABLE);
+}
+
+void Oled::initGPIO()
+{
+	GPIO_InitTypeDef GPIOStruct;
 }
