@@ -7,7 +7,9 @@ class Oled{
 		uint8_t screenHeight;
 		uint8_t* screenBuffer;
 		uint16_t dataPin;
+		uint16_t dataPinSource;
 		uint16_t clockPin;
+		uint16_t clockPinSource;
 		uint16_t dataCommandPin;
 		uint16_t chipSelectPin;
 		uint16_t resetPin;
@@ -15,6 +17,8 @@ class Oled{
 		void initRCC();
 		void initGPIO();
 		void initSPI();
+		void delayMS();
+		void startupSequence();
 	public:
 		Oled();
 		~Oled();

@@ -41,6 +41,8 @@
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
+volatile uint32_t milliseconds = 0;
+
 /******************************************************************************/
 /*            Cortex-M4 Processor Exceptions Handlers                         */
 /******************************************************************************/
@@ -133,14 +135,20 @@ void PendSV_Handler(void)
 {
 }
 
-/**
-  * @brief  This function handles SysTick Handler.
-  * @param  None
-  * @retval None
-  */
+///**
+//  * @brief  This function handles SysTick Handler.
+//  * @param  None
+//  * @retval None
+//  */
 void SysTick_Handler(void)
 {
-/*  TimingDelay_Decrement(); */
+	milliseconds++;
+}
+
+void delayMS(uint16_t delay)
+{
+	milliseconds = 0;
+	while (milliseconds < delay);
 }
 
 /******************************************************************************/
