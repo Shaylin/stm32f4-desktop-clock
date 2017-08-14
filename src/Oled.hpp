@@ -1,4 +1,5 @@
 #include "stm32f4xx.h"
+#include "stm32f4xx_it.h"
 #include "stm32f4_discovery.h"
 
 class Oled{
@@ -17,10 +18,16 @@ class Oled{
 		void initRCC();
 		void initGPIO();
 		void initSPI();
-		void delayMS();
-		void startupSequence();
+		void sendDataByte(uint8_t data);
+		void sendCommandByte(uint8_t command);
+		void runStartupSequence();
 	public:
 		Oled();
 		~Oled();
 		void init();
+		void refresh();
+		void clear();
+		void setContrast(uint8_t contrast);
+		void setPixel(uint8_t x, uint8_t y);
+		void clearPixel(uint8_t x, uint8_t y);
 };

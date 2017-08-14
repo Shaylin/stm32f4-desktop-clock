@@ -2,19 +2,19 @@
 
 Oled::Oled()
 {
-	dataPin = GPIO_Pin_0;
-	dataPinSource = GPIO_PinSource0;
-	clockPin = GPIO_Pin_0;
-	clockPinSource = GPIO_PinSource0;
-	dataCommandPin = GPIO_Pin_0;
+	dataPin = GPIO_Pin_7;
+	dataPinSource = GPIO_PinSource7;
+	clockPin = GPIO_Pin_5;
+	clockPinSource = GPIO_PinSource5;
+	dataCommandPin = GPIO_Pin_1;
 	chipSelectPin = GPIO_Pin_0;
-	resetPin = GPIO_Pin_0;
+	resetPin = GPIO_Pin_3;
 
 	gpioPort = GPIOA;
 
 	screenWidth = 128;
 	screenHeight = 64;
-	screenBuffer = new uint8_t[screenWidth * screenHeight];
+	screenBuffer = new uint8_t[screenWidth * screenHeight / 8];
 }
 
 Oled::~Oled()
@@ -27,6 +27,7 @@ void Oled::init()
 	initRCC();
 	initGPIO();
 	initSPI();
+	runStartupSequence();
 }
 
 void Oled::initRCC()
@@ -67,12 +68,92 @@ void Oled::initSPI()
 	SPI_Cmd(SPI1, ENABLE);
 }
 
-void Oled::delayMS()
+void Oled::sendDataByte(uint8_t data)
+{
+	GPIO_SetBits(gpioPort, dataCommandPin);
+	GPIO_ResetBits(gpioPort, chipSelectPin);
+
+	SPI_I2S_SendData(SPI1, data);
+	while(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+
+	GPIO_SetBits(gpioPort, chipSelectPin);
+}
+
+void Oled::sendCommandByte(uint8_t command)
+{
+	GPIO_ResetBits(gpioPort, dataCommandPin);
+	GPIO_ResetBits(gpioPort, chipSelectPin);
+
+	SPI_I2S_SendData(SPI1, command);
+	while(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+
+	GPIO_SetBits(gpioPort, chipSelectPin);
+}
+
+void Oled::refresh()
+{
+	for (int byteIndex = 0; byteIndex < screenWidth * screenHeight / 8; byteIndex++)
+	{
+		sendDataByte(screenBuffer[byteIndex]);
+	}
+}
+
+void Oled::clear()
+{
+	for (int byteIndex = 0; byteIndex < screenWidth * screenHeight / 8; byteIndex++)
+	{
+		screenBuffer[byteIndex] = 0x00;
+	}
+}
+
+void Oled::setPixel(uint8_t x, uint8_t y)
+{
+	screenBuffer[x + (y / 8 * screenWidth)] |= 1 << (y % 8);
+}
+
+void Oled::clearPixel(uint8_t x, uint8_t y)
 {
 
 }
 
-void Oled::startupSequence()
+void Oled::runStartupSequence()
 {
+	GPIO_ResetBits(gpioPort, dataCommandPin | chipSelectPin | resetPin);
+	delayMS(1);
+	GPIO_SetBits(gpioPort, resetPin);
+	delayMS(1);
+	GPIO_ResetBits(gpioPort, resetPin);
+	delayMS(1);
+	GPIO_SetBits(gpioPort, dataCommandPin | chipSelectPin | resetPin);
 
+	sendCommandByte(0xA8);
+	sendCommandByte(0x3F);
+	sendCommandByte(0xD3);
+	sendCommandByte(0x00);
+	sendCommandByte(0x40);
+	sendCommandByte(0xA1);
+	sendCommandByte(0xDA);
+	sendCommandByte(0x12);
+	sendCommandByte(0xC8);
+	sendCommandByte(0x81);
+	sendCommandByte(0xFF);
+	sendCommandByte(0x20);
+	sendCommandByte(0x00);
+	sendCommandByte(0x21);
+	sendCommandByte(0x00);
+	sendCommandByte(0x7F);
+	sendCommandByte(0x22);
+	sendCommandByte(0x00);
+	sendCommandByte(0x07);
+	sendCommandByte(0xA6);
+	sendCommandByte(0xDB);
+	sendCommandByte(0x40);
+	sendCommandByte(0xA4);
+	sendCommandByte(0xD5);
+	sendCommandByte(0x80);
+	sendCommandByte(0x8D);
+	sendCommandByte(0x14);
+	sendCommandByte(0xAF);
 }
+
+
