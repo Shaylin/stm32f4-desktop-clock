@@ -2,6 +2,7 @@
 #include "stm32f4xx_it.h"
 #include "stm32f4_discovery.h"
 #include "Oled.hpp"
+#include "VectorText.hpp"
 
 int main(void)
 {
@@ -13,6 +14,9 @@ int main(void)
 	Oled oled;
 	oled.init();
 	oled.clear();
+
+	VectorText text(oled);
+
 	oled.refresh();
 
 	while (1)

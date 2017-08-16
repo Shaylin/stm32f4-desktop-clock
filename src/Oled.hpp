@@ -1,3 +1,5 @@
+#pragma once
+
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
 #include "stm32f4_discovery.h"
