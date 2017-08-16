@@ -30,4 +30,6 @@ class Oled{
 		void setContrast(uint8_t contrast);
 		void setPixel(uint8_t x, uint8_t y);
 		void clearPixel(uint8_t x, uint8_t y);
+		uint8_t getScreenWidth();
+		uint8_t getScreenHeight();
 };

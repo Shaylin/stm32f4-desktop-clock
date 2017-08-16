@@ -156,4 +156,12 @@ void Oled::runStartupSequence()
 	sendCommandByte(0xAF);
 }
 
+uint8_t Oled::getScreenWidth()
+{
+	return screenWidth;
+}
 
+uint8_t Oled::getScreenHeight()
+{
+	return screenHeight;
+}

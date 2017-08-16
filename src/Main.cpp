@@ -10,8 +10,6 @@ int main(void)
 	STM_EVAL_LEDInit(LED3);
 	STM_EVAL_LEDOn(LED3);
 
-	int y = 0;
-
 	Oled oled;
 	oled.init();
 	oled.clear();
@@ -20,9 +18,7 @@ int main(void)
 	while (1)
 	{
 		delayMS(50);
-		oled.setPixel(y, 0);
 		oled.refresh();
-		y++;
 		STM_EVAL_LEDToggle(LED3);
 	}
 }
