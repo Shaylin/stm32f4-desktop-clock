@@ -16,6 +16,11 @@ int main(void)
 	oled.clear();
 
 	VectorText text(oled);
+//	text.setText("1234");
+//	text.drawAt(0, 0, 1);
+	text.drawLine(9, 21, 1, 0);
+	text.drawLine(9, 21, 17, 0);
+	text.drawLine(4, 7, 14, 7);
 
 	oled.refresh();
 

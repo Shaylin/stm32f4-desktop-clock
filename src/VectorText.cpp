@@ -1,12 +1,10 @@
 #include "VectorText.hpp"
+#include "VectorFontDefinition.hpp"
 #include "math.h"
 
 VectorText::VectorText(Oled screen)
 {
 	this -> screen = screen;
-
-	//TODO: TESTING ONLY
-	drawVerticalLine(10, 0, 40);
 }
 
 void VectorText::setText(std::string text)
@@ -27,23 +25,34 @@ void VectorText::drawAt(uint8_t xPos, uint8_t yPos, uint8_t fontScale = 1)
 		xPos += glyphWidth;
 	}
 }
-
+//TODO: cleanup and sort out case where there are vertices to the end of the array
+//TODO: vertex count and vertex index is not the same damn thing
+//TODO: these damn things also come out vertically flipped
 void VectorText::drawGlyph(uint8_t xPos, uint8_t yPos, uint8_t glyphIndex)
 {
-	uint8_t numberOfVertices = vectorFont[glyphIndex][0];
+	int* glyph = vectorFont[glyphIndex];
+	uint8_t numberOfVertices = glyph[0];
 
 	uint8_t vertexIndex = 2;
+	uint8_t vertexCount = 0;
 	while (vertexIndex - 2 < numberOfVertices)
 	{
-		int vertexXPos = vectorFont[glyphIndex][vertexIndex];
-		int vertexYPos = vectorFont[glyphIndex][vertexIndex + 1];
+		int startX = glyph[vertexIndex];
+		int startY = glyph[vertexIndex + 1];
+		int endX = glyph[vertexIndex + 2];
+		int endY = glyph[vertexIndex + 3];
 
-		if (vertexXPos != -1 && vertexYPos != -1)
+		if (startX != -1 && endX != -1)
 		{
-			uint8_t pixelX = xPos + vertexXPos;
-			uint8_t pixelY = yPos + vertexYPos;
+			if (endX != -1 && endY != -1)
+			{
+				drawLine(startX, startY, endX, endY);
+			}
+			else
+			{
+				drawLine(startX, startY, startX, startY);
+			}
 		}
-
 		vertexIndex += 2;
 	}
 }
@@ -51,14 +60,62 @@ void VectorText::drawGlyph(uint8_t xPos, uint8_t yPos, uint8_t glyphIndex)
 void VectorText::drawLine(uint8_t startX, uint8_t startY, uint8_t endX, uint8_t endY)
 {
 	int deltaX = endX - startX;
-	int deltaY = endY - startY;
-	if (deltaY == 0)
+
+	if (deltaX == 0)
 	{
 		drawVerticalLine(startX, startY, endY);
 	}
 	else
 	{
-		float deltaError = abs(deltaY / deltaX);
+		drawDiagonalLine(startX, startY, endX, endY);
+	}
+}
+
+void VectorText::drawDiagonalLine(uint8_t startX, uint8_t startY, uint8_t endX, uint8_t endY)
+{
+
+	int deltaX = abs(endX - startX);
+	int signX = sign(endX - startX);
+	int deltaY = abs(endY - startY);
+	int signY = sign(endY - startY);
+	int swapped = 0;
+
+	int x = startX;
+	int y = startY;
+
+	if (deltaY > deltaX)
+	{
+		std::swap(deltaX, deltaY);
+		swapped = 1;
+	}
+
+	int D = 2 * deltaY - deltaX;
+
+	for (int i = 0; i < deltaX; i++)
+	{
+		screen.setPixel(x, y);
+		while (D >= 0)
+		{
+			D -= 2 * deltaX;
+			if (swapped)
+			{
+				x += signX;
+			}
+			else
+			{
+				y += signY;
+			}
+		}
+
+		D += 2 * deltaY;
+		if (swapped)
+		{
+			y += signY;
+		}
+		else
+		{
+			x += signX;
+		}
 	}
 }
 
@@ -70,8 +127,15 @@ void VectorText::drawVerticalLine(uint8_t startX, uint8_t startY, uint8_t endY)
 		startY = endY;
 		endY = tempY;
 	}
-	for (uint8_t y = startY; y < endY; y++)
+	for (uint8_t y = startY; y <= endY; y++)
 	{
 		screen.setPixel(startX, y);
 	}
+}
+
+int VectorText::sign(int number)
+{
+	if (number > 0) return 1;
+	if (number < 0) return -1;
+	return 0;
 }
