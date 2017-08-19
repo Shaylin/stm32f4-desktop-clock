@@ -12,56 +12,57 @@ void VectorText::setText(std::string text)
 	this -> text = text;
 }
 
-void VectorText::drawAt(uint8_t xPos, uint8_t yPos, uint8_t fontScale = 1)
+void VectorText::drawAt(uint8_t xPos, uint8_t yPos, float fontScale = 1)
 {
 	for (uint8_t characterIndex = 0; characterIndex < text.length(); characterIndex++)
 	{
 		char character = text[characterIndex];
 		uint8_t glyphIndex = character - 32;
 
-		drawGlyph(xPos, yPos, glyphIndex);
+		drawGlyph(xPos, yPos, glyphIndex, fontScale);
 
 		uint8_t glyphWidth = vectorFont[glyphIndex][1];
-		xPos += glyphWidth;
+		xPos += glyphWidth * fontScale;
 	}
 }
-//TODO: cleanup and sort out case where there are vertices to the end of the array
-//TODO: vertex count and vertex index is not the same damn thing
+
 //TODO: these damn things also come out vertically flipped
-void VectorText::drawGlyph(uint8_t xPos, uint8_t yPos, uint8_t glyphIndex)
+//TODO: Sort out the positioning
+void VectorText::drawGlyph(uint8_t xPos, uint8_t yPos, uint8_t glyphIndex, float fontScale)
 {
 	int* glyph = vectorFont[glyphIndex];
-	uint8_t numberOfVertices = glyph[0];
+	int numberOfVertices = glyph[0];
 
-	uint8_t vertexIndex = 2;
-	uint8_t vertexCount = 0;
-	while (vertexIndex - 2 < numberOfVertices)
+	int vertexIndex = 2;
+	int vertexCount = 0;
+
+	while (vertexCount < numberOfVertices)
 	{
 		int startX = glyph[vertexIndex];
 		int startY = glyph[vertexIndex + 1];
 		int endX = glyph[vertexIndex + 2];
 		int endY = glyph[vertexIndex + 3];
 
-		if (startX != -1 && endX != -1)
+		if (startX != -1 && startY != -1 )
 		{
 			if (endX != -1 && endY != -1)
 			{
-				drawLine(startX, startY, endX, endY);
+				drawLine(startX * fontScale + xPos, (26 - startY) * fontScale + yPos, endX * fontScale + xPos, (26 - endY) * fontScale + yPos);
 			}
 			else
 			{
-				drawLine(startX, startY, startX, startY);
+				drawLine(startX * fontScale + xPos, (26 - startY) * fontScale + yPos, startX * fontScale + xPos, (26 - startY) * fontScale + yPos);
 			}
 		}
+
+		vertexCount ++;
 		vertexIndex += 2;
 	}
 }
 
 void VectorText::drawLine(uint8_t startX, uint8_t startY, uint8_t endX, uint8_t endY)
 {
-	int deltaX = endX - startX;
-
-	if (deltaX == 0)
+	if (endX - startX == 0)
 	{
 		drawVerticalLine(startX, startY, endY);
 	}

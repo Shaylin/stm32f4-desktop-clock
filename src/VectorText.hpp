@@ -5,7 +5,7 @@
 #include "Oled.hpp"
 #include <string>
 
-//TODO: The line drawing functionality can possibly be its own class
+//TODO: The line drawing functionality must be its own class
 class VectorText{
 	private:
 		uint8_t xPos;
@@ -13,7 +13,7 @@ class VectorText{
 		uint8_t fontScale;
 		std::string text;
 		Oled screen;
-		void drawGlyph(uint8_t xPos, uint8_t yPos, uint8_t glyphIndex);
+		void drawGlyph(uint8_t xPos, uint8_t yPos, uint8_t glyphIndex, float fontScale);
 		void drawVerticalLine(uint8_t startX, uint8_t startY, uint8_t endY);
 		void drawDiagonalLine(uint8_t startX, uint8_t startY, uint8_t endX, uint8_t endY);
 		int sign(int number);
@@ -22,5 +22,5 @@ class VectorText{
 		VectorText(Oled screen);
 		void setText(std::string text);
 		void drawLine(uint8_t startX, uint8_t startY, uint8_t endX, uint8_t endY);
-		void drawAt(uint8_t xPos, uint8_t yPos, uint8_t fontScale);
+		void drawAt(uint8_t xPos, uint8_t yPos, float fontScale);
 };
