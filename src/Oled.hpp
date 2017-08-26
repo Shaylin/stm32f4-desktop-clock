@@ -20,13 +20,13 @@ class Oled{
 		void initRCC();
 		void initGPIO();
 		void initSPI();
+		void init();
 		void sendDataByte(uint8_t data);
 		void sendCommandByte(uint8_t command);
 		void runStartupSequence();
 	public:
 		Oled();
 		~Oled();
-		void init();
 		void refresh();
 		void clear();
 		void setContrast(uint8_t contrast);

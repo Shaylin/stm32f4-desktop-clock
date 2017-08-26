@@ -3,6 +3,7 @@
 #include "stm32f4_discovery.h"
 #include "Oled.hpp"
 #include "VectorText.hpp"
+#include "Calendar.hpp"
 
 int main(void)
 {
@@ -11,19 +12,27 @@ int main(void)
 	STM_EVAL_LEDInit(LED3);
 
 	Oled oled;
-	oled.init();
+
 	oled.clear();
+	uint8_t contrast = 0x00;
 
 	VectorText text(oled);
-	text.setText("crab");
-	text.drawAt(0, 0, 0.5);
-	text.drawAt(0, 26, 1);
 
-	oled.refresh();
+	Calendar calendar;
+
+	TimeAndDate timeAndDate;
+
+
+	text.setText("crab");
+	text.drawAt(48, 0, 0.5);
+
+	text.setText("volume");
+	text.drawAt(0, 16, 0.7);
 
 	while (1)
 	{
 		delayMS(50);
+		oled.setContrast(contrast += 0x10);
 		oled.refresh();
 		STM_EVAL_LEDToggle(LED3);
 	}

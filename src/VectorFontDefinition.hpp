@@ -1,5 +1,6 @@
 #pragma once
 
+int vectorFontHeight = 26;
 /* Simplex Character Set*/
 int vectorFont[95][112] = {
     0,16, /* Ascii 32 */

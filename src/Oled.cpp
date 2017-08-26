@@ -15,6 +15,8 @@ Oled::Oled()
 	screenWidth = 128;
 	screenHeight = 64;
 	screenBuffer = new uint8_t[screenWidth * screenHeight / 8];
+
+	init();
 }
 
 Oled::~Oled()
@@ -164,4 +166,10 @@ uint8_t Oled::getScreenWidth()
 uint8_t Oled::getScreenHeight()
 {
 	return screenHeight;
+}
+
+void Oled::setContrast(uint8_t contrast)
+{
+	sendCommandByte(0x81);
+	sendCommandByte(contrast);
 }
