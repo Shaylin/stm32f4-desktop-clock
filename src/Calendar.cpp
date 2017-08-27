@@ -96,11 +96,11 @@ TimeAndDate Calendar::receiveTimeAndDate()
 	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED));
 	timeAndDate.dayOfWeek = bcdToDecimal(I2C_ReceiveData(I2C1));
 	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED));
+	timeAndDate.date = bcdToDecimal(I2C_ReceiveData(I2C1));
+	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED));
 	timeAndDate.month = bcdToDecimal(I2C_ReceiveData(I2C1));
 	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED));
 	timeAndDate.year = bcdToDecimal(I2C_ReceiveData(I2C1));
-	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED));
-	timeAndDate.date = bcdToDecimal(I2C_ReceiveData(I2C1));
 
 	return timeAndDate;
 }
@@ -127,11 +127,11 @@ void Calendar::sendTimeAndDate(TimeAndDate timeAndDate)
 	while (!I2C_CheckEvent(I2C1,I2C_EVENT_MASTER_BYTE_TRANSMITTED));
 	I2C_SendData(I2C1, decimalToBCD(timeAndDate.dayOfWeek));
 	while (!I2C_CheckEvent(I2C1,I2C_EVENT_MASTER_BYTE_TRANSMITTED));
+	I2C_SendData(I2C1, decimalToBCD(timeAndDate.date));
+	while (!I2C_CheckEvent(I2C1,I2C_EVENT_MASTER_BYTE_TRANSMITTED));
 	I2C_SendData(I2C1, decimalToBCD(timeAndDate.month));
 	while (!I2C_CheckEvent(I2C1,I2C_EVENT_MASTER_BYTE_TRANSMITTED));
 	I2C_SendData(I2C1, decimalToBCD(timeAndDate.year));
-	while (!I2C_CheckEvent(I2C1,I2C_EVENT_MASTER_BYTE_TRANSMITTED));
-	I2C_SendData(I2C1, decimalToBCD(timeAndDate.date));
 	while (!I2C_CheckEvent(I2C1,I2C_EVENT_MASTER_BYTE_TRANSMITTED));
 }
 
@@ -156,6 +156,22 @@ void Calendar::stopTransmission()
 
 uint8_t Calendar::getTemperature()
 {
+	startTransmission();
 
+	I2C_SendData(I2C1, 0x11);
+	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
+
+	I2C_GenerateSTART(I2C1, ENABLE);
+	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT));
+
+	I2C_Send7bitAddress(I2C1, chipAddress, I2C_Direction_Receiver);
+	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));
+
+	while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED));
+	uint8_t temperature = I2C_ReceiveData(I2C1);
+
+	stopTransmission();
+
+	return temperature;
 }
 

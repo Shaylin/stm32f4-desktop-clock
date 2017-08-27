@@ -7,7 +7,7 @@ Oled::Oled()
 	clockPin = GPIO_Pin_5;
 	clockPinSource = GPIO_PinSource5;
 	dataCommandPin = GPIO_Pin_1;
-	chipSelectPin = GPIO_Pin_0;
+	chipSelectPin = GPIO_Pin_2;
 	resetPin = GPIO_Pin_3;
 
 	gpioPort = GPIOA;
